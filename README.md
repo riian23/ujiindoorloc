@@ -1,1 +1,1 @@
-# fingerprinting with UJIIndooorLoc dataset
+# WiFi fingerprinting with UJIIndooorLoc dataset
