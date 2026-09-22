@@ -1,0 +1,22 @@
+name: ujiindoorloc
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - pyyaml
+  - tqdm
+  - libgomp
+  - ipykernel
+  - nbformat
+  - nbconvert
+  - pip
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu121
+      - torch==2.5.1
