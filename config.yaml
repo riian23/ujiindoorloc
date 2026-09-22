@@ -1,0 +1,59 @@
+seed: 42
+
+data:
+  raw_train: data/raw/trainingData.csv
+  raw_test: data/raw/validationData.csv
+  cache_dir: data/cache/
+  missing_rssi_value: 100
+  rssi_min: -105
+  rssi_max: 0
+  drop_all_missing: true
+  drop_duplicates: true
+  train_val_split: 0.8
+
+mlp:
+  encoder: linear
+
+  backbone:
+    hidden_dims: [256, 128, 64]
+    activation: relu
+    dropout: 0.3
+    batch_norm: true
+
+  training:
+    batch_size: 128
+    epochs: 100
+    learning_rate: 0.001
+    weight_decay: 0.0
+    patience: 15
+
+  runs:
+    classification_baseline:
+      heads: {building: 0.3, floor: 0.7}
+      select: {metric: combined_hit_rate, mode: max}
+    classification_rp:
+      heads: {building: 0.3, floor: 0.7, rp: 1.0}
+      select: {metric: evaal_3d_error_m, mode: min}
+    regression:
+      heads: {coord: 1.0}
+      select: {metric: mean_2d_error_m, mode: min}
+    regression_multihead:
+      heads: {building: 0.3, floor: 0.7, coord: 1.0}
+      select: {metric: evaal_3d_error_m, mode: min}
+
+  tuned:
+    mlp_regression: {hidden_dims: [512, 256, 128, 64], dropout: 0.1, learning_rate: 0.001, weight_decay: 0.00001}
+    mlp_rp: {hidden_dims: [256, 128], dropout: 0.5, learning_rate: 0.001, weight_decay: 0.0}
+    mlp_multihead: {hidden_dims: [256, 128, 64], dropout: 0.3, learning_rate: 0.001, weight_decay: 0.0}
+
+  report:
+    mlp_regression: {labels: classification_baseline, coord: regression}
+    mlp_rp: {labels: classification_rp, coord: classification_rp}
+    mlp_multihead: {labels: regression_multihead, coord: regression_multihead}
+
+knn:
+  encoder: linear
+  distance: euclidean
+  k_candidates: [1, 3, 5, 7, 9, 11, 15, 21, 31, 41]
+  weightings: [uniform, inverse, inverse_squared, dudani]
+  select: {metric: evaal_3d_error_m, mode: min}
